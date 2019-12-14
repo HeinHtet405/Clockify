@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/colorPrimary"
+    tools:context=".activities.ApiKeyActivity">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:layout_width="240dp"
+        android:layout_height="240dp"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@id/activity_api_key_et_key"
+        android:layout_gravity="center"
+        android:src="@drawable/img_key" />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/activity_api_key_et_key"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_margin="16dp"
+        android:background="@drawable/edt_background"
+        android:hint="@string/lbl_hint_api_key"
+        android:textColorHint="@color/colorHintText"
+        android:textColor="@color/colorPrimaryText"
+        android:drawableStart="@drawable/ic_key"
+        android:drawablePadding="20dp"
+        android:textCursorDrawable="@drawable/app_cursor"
+        android:gravity="center"
+        android:padding="12dp"
+        android:layout_gravity="center" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/activity_api_key_btn_login"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="@string/lbl_login"
+        android:textColor="@color/colorAccent"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_below="@id/activity_api_key_et_key"
+        app:cornerRadius="50dp"
+        android:textAllCaps="false"
+        app:backgroundTint="@color/colorWhite"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/activity_api_key_tv_version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="16dp"
+        android:text="@string/lbl_version"
+        android:textColor="@color/colorWhite" />
+
+</RelativeLayout>

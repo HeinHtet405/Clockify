@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">Clockify</string>
+
+    <string name="lbl_version">Version : </string>
+    <string name="lbl_hint_api_key">Enter your clockify api key</string>
+    <string name="lbl_login">LOG IN</string>
+    <string name="lbl_add">ADD</string>
+    <string name="lbl_category">category</string>
+    <string name="lbl_category_all">all category</string>
+    <string name="lbl_project_title">Project</string>
+    <string name="lbl_project_hint">Select your project</string>
+    <string name="lbl_start_title">Start Time</string>
+    <string name="lbl_start_hint">Pick Start Time</string>
+    <string name="lbl_end_title">End Time</string>
+    <string name="lbl_end_hint">Pick End Time</string>
+    <string name="lbl_work_title">Work</string>
+    <string name="lbl_work_hint">What have you worked on?</string>
+    <string name="lbl_save">Save</string>
+    <string name="lbl_cancel">Cancel</string>
+    <string name="lbl_project_list">Project List</string>
+    <string name="lbl_category_list">Category List</string>
+    <string name="lbl_date_list">Date List</string>
+    <string name="lbl_category_title">Category</string>
+    <string name="lbl_category_select">Select your category</string>
+    <string name="lbl_category_hint">Create new category</string>
+    <string name="lbl_day">Today</string>
+    <string name="lbl_swipe_down_retry">Swipe down to retry</string>
+    <string name="lbl_connection_problem">Please check your internet connection</string>
+    <string name="lbl_tap_retry">Tap to retry</string>
+    <string name="lbl_empty">No Schedule Yet…</string>
+</resources>

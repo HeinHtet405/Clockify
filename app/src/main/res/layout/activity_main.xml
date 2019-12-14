@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".activities.MainActivity">
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar_main"/>
+
+    <LinearLayout
+        android:id="@+id/activity_main_ll_add"
+        android:layout_below="@id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="4dp"
+        android:background="@color/colorPrimary"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/activity_main_btn_category"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="12dp"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:text="@string/lbl_category_title"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:textColor="@color/colorWhite"
+            tools:text="Category"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/activity_main_btn_day"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="12dp"
+            android:gravity="center"
+            android:ellipsize="end"
+            android:text="@string/lbl_day"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:textColor="@color/colorWhite"
+            tools:text="Today"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/activity_main_btn_add"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="12dp"
+            android:gravity="center"
+            android:text="@string/lbl_add"
+            app:cornerRadius="8dp"
+            android:textStyle="bold"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:textColor="@color/colorAccent"
+            tools:text="ADD"/>
+
+    </LinearLayout>
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/activity_main_srl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/activity_main_ll_add">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/activity_main_rv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:overScrollMode="never"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/activity_main_fab_add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:src="@drawable/ic_timer"
+        android:layout_margin="16dp"
+        app:fabSize="normal"/>
+
+</RelativeLayout>

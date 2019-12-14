@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".activities.ScheduleCreateEditActivity">
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar" />
+
+    <LinearLayout
+        android:id="@+id/activity_sce_ll_category"
+        android:layout_below="@id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/lbl_category_title"
+            android:textColor="@color/colorHintText" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/activity_sce_tv_category"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/lbl_category_select"
+            android:textColorHint="@color/colorSecondaryText"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:textSize="16sp"
+            android:textColor="@color/colorPrimaryText" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/activity_sce_ll_project"
+        android:layout_below="@id/activity_sce_ll_category"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/lbl_project_title"
+            android:textColor="@color/colorHintText" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/activity_sce_tv_project"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/lbl_project_hint"
+            android:textColorHint="@color/colorSecondaryText"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:textSize="16sp"
+            android:textColor="@color/colorPrimaryText" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/activity_sce_ll_start"
+        android:layout_below="@id/activity_sce_ll_project"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/lbl_start_title"
+            android:textColor="@color/colorHintText" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/activity_sce_tv_start"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/lbl_start_hint"
+            android:textColorHint="@color/colorSecondaryText"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:textSize="16sp"
+            android:textColor="@color/colorPrimaryText" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/activity_sce_ll_end"
+        android:layout_below="@id/activity_sce_ll_start"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/lbl_end_title"
+            android:textColor="@color/colorHintText" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/activity_sce_tv_end"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/lbl_end_hint"
+            android:textColorHint="@color/colorSecondaryText"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:textSize="16sp"
+            android:textColor="@color/colorPrimaryText" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/activity_sce_ll_work"
+        android:layout_below="@id/activity_sce_ll_end"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/lbl_work_title"
+            android:textColor="@color/colorHintText" />
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/activity_sce_et_work"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/lbl_work_hint"
+            android:textColorHint="@color/colorSecondaryText"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:textSize="16sp"
+            android:textColor="@color/colorPrimaryText" />
+
+    </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/activity_sce_fab_save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_save"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"/>
+
+</RelativeLayout>
