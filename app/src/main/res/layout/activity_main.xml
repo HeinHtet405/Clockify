@@ -46,6 +46,19 @@
             tools:text="Today"/>
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/activity_main_btn_month"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="12dp"
+            android:gravity="center"
+            android:ellipsize="end"
+            android:text="@string/lbl_month"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:textColor="@color/colorWhite"
+            tools:text="Month"/>
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/activity_main_btn_add"
             android:layout_width="0dp"
             android:layout_height="match_parent"

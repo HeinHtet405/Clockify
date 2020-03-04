@@ -24,6 +24,7 @@
     <string name="lbl_category_select">Select your category</string>
     <string name="lbl_category_hint">Create new category</string>
     <string name="lbl_day">Today</string>
+    <string name="lbl_month">Month</string>
     <string name="lbl_swipe_down_retry">Swipe down to retry</string>
     <string name="lbl_connection_problem">Please check your internet connection</string>
     <string name="lbl_tap_retry">Tap to retry</string>

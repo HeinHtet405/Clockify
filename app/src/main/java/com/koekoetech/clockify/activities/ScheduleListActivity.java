@@ -12,6 +12,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.koekoetech.clockify.R;
 import com.koekoetech.clockify.activities.base.BaseActivity;
 import com.koekoetech.clockify.adapters.ScheduleRVAdapter;
@@ -37,6 +38,9 @@ public class ScheduleListActivity extends BaseActivity {
 
     @BindView(R.id.activity_schedule_rv)
     RecyclerView rvSchedule;
+
+    @BindView(R.id.activity_schedule_fab_add)
+    FloatingActionButton fabAdd;
 
     private Unbinder unbinder;
     private Realm mRealm;
@@ -91,6 +95,9 @@ public class ScheduleListActivity extends BaseActivity {
             }
         });
         rvSchedule.setAdapter(scheduleRVAdapter);
+
+        fabAdd.setImageResource(R.drawable.ic_schedule);
+        fabAdd.getDrawable().mutate().setTint(ContextCompat.getColor(this, R.color.colorWhite));
     }
 
     private void getScheduleDataList() {

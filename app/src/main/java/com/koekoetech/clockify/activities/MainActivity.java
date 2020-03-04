@@ -1,8 +1,11 @@
 package com.koekoetech.clockify.activities;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -16,16 +19,21 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.checkbox.MaterialCheckBox;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.kal.rackmonthpicker.RackMonthPicker;
 import com.koekoetech.clockify.R;
 import com.koekoetech.clockify.activities.base.NetPagingRVActivity;
 import com.koekoetech.clockify.adapters.TimeEntryRecordRVAdapter;
 import com.koekoetech.clockify.dbStorage.CategoryDbAccess;
 import com.koekoetech.clockify.dbStorage.TimeEntryDbAccess;
+import com.koekoetech.clockify.dbStorage.TimeEntryListDbAccess;
 import com.koekoetech.clockify.dialogs.CategoryCreateDialog;
 import com.koekoetech.clockify.dialogs.CategoryListBottomSheet;
 import com.koekoetech.clockify.dialogs.ProfileDialog;
 import com.koekoetech.clockify.helpers.AppProgressDialogHelper;
 import com.koekoetech.clockify.helpers.DateHelper;
+import com.koekoetech.clockify.helpers.HolidayHelper;
 import com.koekoetech.clockify.helpers.MyConstant;
 import com.koekoetech.clockify.helpers.NetAdapterConfigImpl;
 import com.koekoetech.clockify.helpers.SharePreferenceHelper;
@@ -40,12 +48,14 @@ import com.koekoetech.clockify.rest.RetrofitCallbackHelper;
 import com.koekoetech.clockify.rest.endpoints.TimeEntryEndpoints;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindString;
 import butterknife.BindView;
@@ -53,9 +63,11 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import io.realm.Realm;
+import needle.Needle;
+import needle.UiRelatedTask;
 import retrofit2.Call;
 
-public class MainActivity extends NetPagingRVActivity<List<TimeEntryRecord>, TimeEntryWrapper, TimeEntryRecordRVAdapter> implements CategoryListBottomSheet.OnClickCategory, DatePickerDialog.OnDateSetListener {
+public class MainActivity extends NetPagingRVActivity<List<TimeEntryRecord>, TimeEntryWrapper, TimeEntryRecordRVAdapter> implements CategoryListBottomSheet.OnClickCategory, DatePickerDialog.OnDateSetListener, ProfileDialog.OnClickMonth {
 
     @BindView(R.id.activity_main_rv)
     RecyclerView rvTimeEntry;
@@ -75,24 +87,49 @@ public class MainActivity extends NetPagingRVActivity<List<TimeEntryRecord>, Tim
     @BindView(R.id.activity_main_btn_add)
     MaterialButton btnAdd;
 
+    @BindView(R.id.activity_main_btn_month)
+    MaterialButton btnMonth;
+
     @BindString(R.string.app_name)
     String appName;
 
     @BindString(R.string.lbl_category_title)
     String categoryTitle;
 
+    @BindView(R.id.activity_main_fab_add)
+    FloatingActionButton fabAdd;
+
     private Unbinder unbinder;
+
     private Realm mRealm;
+
     private NetAdapterConfig adapterConfig;
+
     private TimeEntryDbAccess timeEntryDbAccess;
+
     private TimeEntryRecordRVAdapter timeEntryRecordRVAdapter;
+
     private UserInfo userInfo;
+
     private String apiKey;
+
     private Category getCategory;
+
     private DatePickerDialog dpd;
+
     private String getPickDate = "";
+
     private AppProgressDialogHelper appProgressDialogHelper;
+
     private CategoryDbAccess categoryDbAccess;
+
+    private SharePreferenceHelper sharePreferenceHelper;
+
+    private int dateType = 0;
+
+    private ArrayList<String> finalDaySelectedList = new ArrayList<>();
+
+    private boolean selectMonth = false;
 
     @Override
     protected int getLayoutResource() {
@@ -186,7 +223,7 @@ public class MainActivity extends NetPagingRVActivity<List<TimeEntryRecord>, Tim
         appProgressDialogHelper = new AppProgressDialogHelper(this);
         appProgressDialogHelper.setMessage("Please wait...");
         timeEntryRecordRVAdapter = new TimeEntryRecordRVAdapter();
-        SharePreferenceHelper sharePreferenceHelper = SharePreferenceHelper.getHelper(this);
+        sharePreferenceHelper = SharePreferenceHelper.getHelper(this);
         userInfo = sharePreferenceHelper.getUserInformation();
         apiKey = sharePreferenceHelper.getApiKey();
 
@@ -195,6 +232,11 @@ public class MainActivity extends NetPagingRVActivity<List<TimeEntryRecord>, Tim
                 .placeholder(R.drawable.img_logo)
                 .apply(RequestOptions.circleCropTransform())
                 .into(ivProfile);
+
+        playingDateButton();
+
+        fabAdd.setImageResource(R.drawable.ic_timer);
+        fabAdd.getDrawable().mutate().setTint(ContextCompat.getColor(this, R.color.colorWhite));
     }
 
     @OnClick(R.id.activity_main_fab_add)
@@ -207,6 +249,7 @@ public class MainActivity extends NetPagingRVActivity<List<TimeEntryRecord>, Tim
     public void clickProfile() {
         ProfileDialog profileDialog = new ProfileDialog(userInfo);
         profileDialog.show(getSupportFragmentManager());
+        profileDialog.setOnClickListener(this);
     }
 
     @OnClick(R.id.activity_main_btn_category)
@@ -220,6 +263,48 @@ public class MainActivity extends NetPagingRVActivity<List<TimeEntryRecord>, Tim
     public void clickBtnDay() {
         getDateFromPicker();
     }
+
+    @OnClick(R.id.activity_main_btn_month)
+    public void clickBtnMonth() {
+        new RackMonthPicker(this)
+                .setLocale(Locale.ENGLISH)
+                .setPositiveButton((month, startDate, endDate, year, monthLabel) -> {
+                    Calendar cal = Calendar.getInstance();
+                    cal.set(Calendar.MONTH, month - 1);
+                    cal.set(Calendar.YEAR, year);
+                    SimpleDateFormat df = new SimpleDateFormat("MMM-yyyy", Locale.UK);
+                    btnMonth.setText(df.format(cal.getTime()));
+                    filterDayProcess(month, year, endDate);
+                    selectMonth = true;
+                })
+                .setNegativeButton(Dialog::dismiss).show();
+    }
+
+    private void filterDayProcess(int month, int year, int endDate) {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.MONTH, month - 1);
+        cal.set(Calendar.YEAR, year);
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.UK);
+        SimpleDateFormat weekOfDayFormat = new SimpleDateFormat("E", Locale.UK);
+        ArrayList<String> weekDayList = new ArrayList<>();
+        ArrayList<String> weekEndList = new ArrayList<>();
+        for (int i = 0; i < endDate; i++) {
+            cal.set(Calendar.DAY_OF_MONTH, i + 1);
+            String dayOfWeek = weekOfDayFormat.format(cal.getTime());
+            if (TextUtils.equals("Sun", dayOfWeek) ||
+                    TextUtils.equals("Sat", dayOfWeek)) {
+                weekEndList.add(df.format(cal.getTime()));
+                Log.i("hein", "filterDayProcess: " + weekEndList);
+            } else {
+                weekDayList.add(df.format(cal.getTime()));
+            }
+        }
+        if (year == 2020) {
+            weekDayList.removeAll(HolidayHelper.holiday2020list());
+        }
+        finalDaySelectedList.addAll(weekDayList);
+    }
+
 
     private void getDateFromPicker() {
         Calendar now = Calendar.getInstance();
@@ -257,42 +342,14 @@ public class MainActivity extends NetPagingRVActivity<List<TimeEntryRecord>, Tim
                 .setTitle("Confirm Submit")
                 .setMessage("Are you sure to submit this schedule to Clockify?")
                 .setPositiveButton("Submit", (dialog, which) -> {
-                    String categoryId = getCategory.getId();
-
-                    if (TextUtils.isEmpty(getPickDate)) {
-                        getPickDate = DateHelper.getTodayDate();
-                    }
-
-                    int checkSize = 0;
-                    List<TimeEntry> getScheduleList = getScheduleData(categoryId);
-                    if (!getScheduleList.isEmpty()) {
-                        int scheduleSize = getScheduleList.size();
-                        for (TimeEntry timeEntry : getScheduleList) {
-                            String startTime = DateHelper.localTimeToServerTime(timeEntry.getStartTime());
-                            String endTime = DateHelper.localTimeToServerTime(timeEntry.getEndTime());
-                            String completeStartDate = getPickDate + "T" + startTime + "Z";
-                            String completeEndDate = getPickDate + "T" + endTime + "Z";
-
-                            // Server send time entry model
-                            TimeEntry createTime = new TimeEntry();
-                            createTime.setStartTime(completeStartDate);
-                            createTime.setBillable(timeEntry.isBillable());
-                            createTime.setDescription(timeEntry.getDescription());
-                            createTime.setProjectId(timeEntry.getProjectId());
-                            createTime.setEndTime(completeEndDate);
-
-                            // Send to server
-                            postTimeEntry(createTime);
-
-                            checkSize += 1;
-                        }
-
-                        if (checkSize == scheduleSize) {
-                            onRefresh();
-                        }
-
+                    if (dateType == 0) {
+                        processTimeEntry(0);
                     } else {
-                        Toast.makeText(this, "You need to fill your schedule.", Toast.LENGTH_SHORT).show();
+                        if (selectMonth) {
+                            processTimeEntry(1);
+                        } else {
+                            Toast.makeText(this, "Please selected your schedule month", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
@@ -302,6 +359,94 @@ public class MainActivity extends NetPagingRVActivity<List<TimeEntryRecord>, Tim
             positiveButton.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary));
         });
         alertDialog.show();
+    }
+
+    private void processTimeEntry(int dateType) {
+        if (dateType == 0) {
+            String categoryId = getCategory.getId();
+
+            if (TextUtils.isEmpty(getPickDate)) {
+                getPickDate = DateHelper.getTodayDate();
+            }
+
+            int checkSize = 0;
+            List<TimeEntry> getScheduleList = getScheduleData(categoryId);
+            if (!getScheduleList.isEmpty()) {
+                int scheduleSize = getScheduleList.size();
+                for (TimeEntry timeEntry : getScheduleList) {
+                    String startTime = DateHelper.localTimeToServerTime(timeEntry.getStartTime());
+                    String endTime = DateHelper.localTimeToServerTime(timeEntry.getEndTime());
+                    String completeStartDate = getPickDate + "T" + startTime + "Z";
+                    String completeEndDate = getPickDate + "T" + endTime + "Z";
+
+                    // Server send time entry model
+                    TimeEntry createTime = new TimeEntry();
+                    createTime.setStartTime(completeStartDate);
+                    createTime.setBillable(timeEntry.isBillable());
+                    createTime.setDescription(timeEntry.getDescription());
+                    createTime.setProjectId(timeEntry.getProjectId());
+                    createTime.setEndTime(completeEndDate);
+
+                    // Send to server
+                    postTimeEntry(createTime);
+
+                    checkSize += 1;
+                }
+
+                if (checkSize == scheduleSize) {
+                    onRefresh();
+                }
+            }
+        } else {
+            appProgressDialogHelper.show();
+            Needle.onBackgroundThread().execute(new UiRelatedTask<Void>() {
+                @Override
+                protected Void doWork() {
+                    Realm mRealm = Realm.getDefaultInstance();
+                    TimeEntryListDbAccess timeEntryListDbAccess = new TimeEntryListDbAccess(mRealm);
+                    CategoryDbAccess categoryDbAccess = new CategoryDbAccess(mRealm);
+                    String categoryId = categoryDbAccess.getFirstCategory().getId();
+                    List<TimeEntry> getScheduleList = getScheduleListData(categoryId, timeEntryListDbAccess);
+                    if (!getScheduleList.isEmpty()) {
+                        for (String selectedDay : finalDaySelectedList) {
+                            for (TimeEntry timeEntry : getScheduleList) {
+                                String startTime = DateHelper.localTimeToServerTime(timeEntry.getStartTime());
+                                String endTime = DateHelper.localTimeToServerTime(timeEntry.getEndTime());
+                                String completeStartDate = selectedDay + "T" + startTime + "Z";
+                                String completeEndDate = selectedDay + "T" + endTime + "Z";
+
+                                // Server send time entry model
+                                TimeEntry createTime = new TimeEntry();
+                                createTime.setStartTime(completeStartDate);
+                                createTime.setBillable(timeEntry.isBillable());
+                                createTime.setDescription(timeEntry.getDescription());
+                                createTime.setProjectId(timeEntry.getProjectId());
+                                createTime.setEndTime(completeEndDate);
+
+                                // Send to server
+                                postTimeEntryAsync(createTime);
+                            }
+                        }
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void thenDoUiRelatedWork(Void aVoid) {
+                    appProgressDialogHelper.dismiss();
+                    onRefresh();
+                }
+            });
+        }
+    }
+
+    private void postTimeEntryAsync(TimeEntry timeEntry) {
+        Call<TimeEntry> timeEntryCall = RestClient.getTimeEntryEndpoints(apiKey).postTimeEntry(userInfo.getActiveWorkspace(), timeEntry);
+        try {
+            timeEntryCall.execute();
+        }catch (Exception e) {
+            Log.e("hein", "postOneMonthEntry: fail!", e);
+        }
     }
 
     private void postTimeEntry(TimeEntry timeEntry) {
@@ -321,7 +466,28 @@ public class MainActivity extends NetPagingRVActivity<List<TimeEntryRecord>, Tim
                 Toast.makeText(MainActivity.this, "Fail to sent data", Toast.LENGTH_SHORT).show();
             }
         });
+    }
 
+    private List<TimeEntry> getScheduleListData(String id, TimeEntryListDbAccess timeEntryListDbAccess) {
+        List<TimeEntry> timeEntryList = timeEntryListDbAccess.getAllTimeEntryList();
+        HashMap<String, List<TimeEntry>> timeEntryMap = new HashMap<>();
+        for (TimeEntry timeEntry : timeEntryList) {
+            final String categoryId = timeEntry.getCategoryId();
+            List<TimeEntry> groupedEntryList = timeEntryMap.get(categoryId);
+            if (groupedEntryList == null) {
+                groupedEntryList = new ArrayList<>();
+            }
+            groupedEntryList.add(timeEntry);
+            timeEntryMap.put(categoryId, groupedEntryList);
+        }
+
+        List<TimeEntry> getTimeEntryByCategory = new ArrayList<>();
+        for (String categoryId : timeEntryMap.keySet()) {
+            if (categoryId.equals(id)) {
+                getTimeEntryByCategory = timeEntryMap.get(categoryId);
+            }
+        }
+        return getTimeEntryByCategory;
     }
 
     private List<TimeEntry> getScheduleData(String id) {
@@ -382,5 +548,27 @@ public class MainActivity extends NetPagingRVActivity<List<TimeEntryRecord>, Tim
         getPickDate = DateHelper.formatDate(calendar.getTime(), MyConstant.PATTERN_DMY_SERVER_DASH);
         btnDay.setText(getPickDate);
         dpd = null;
+    }
+
+    @Override
+    public void onClickMonthType(MaterialCheckBox checkBox) {
+        if (checkBox.isChecked()) {
+            sharePreferenceHelper.setDateType(true);
+        } else {
+            sharePreferenceHelper.setDateType(false);
+        }
+        playingDateButton();
+    }
+
+    private void playingDateButton() {
+        if (sharePreferenceHelper.getDateType()) {
+            dateType = 1;
+            btnDay.setVisibility(View.GONE);
+            btnMonth.setVisibility(View.VISIBLE);
+        } else {
+            dateType = 0;
+            btnDay.setVisibility(View.VISIBLE);
+            btnMonth.setVisibility(View.GONE);
+        }
     }
 }

@@ -14,6 +14,7 @@ public class SharePreferenceHelper {
     private static final String PREF_USER_INFO = "user_information";
     private static final String PREF_IS_LOG_IN = "log_in";
     private static final String PREF_API_KEY = "api_key";
+    private static final String PREF_MONTH_CHECK = "month_check";
 
     private ContextHelper contextHelper;
 
@@ -93,6 +94,14 @@ public class SharePreferenceHelper {
         getSharedPreferencesEditor().putString(PREF_USER_INFO, userInfo).apply();
     }
     /* USER INFO [END] */
+
+    public boolean getDateType() {
+        return getSharedPreferences().getBoolean(PREF_MONTH_CHECK, false);
+    }
+
+    public void setDateType(boolean isMonthCheck) {
+        getSharedPreferencesEditor().putBoolean(PREF_MONTH_CHECK, isMonthCheck).apply();
+    }
 
     /* CLEAR SHARE PREFERENCE [START] */
     public void clearSharedPreferences() {

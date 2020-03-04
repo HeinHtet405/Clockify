@@ -8,6 +8,7 @@ import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.koekoetech.clockify.R;
 import com.koekoetech.clockify.activities.base.BaseActivity;
 import com.koekoetech.clockify.dbStorage.CategoryDbAccess;
@@ -52,6 +53,9 @@ public class ScheduleCreateEditActivity extends BaseActivity implements ProjectL
     @BindView(R.id.activity_sce_et_work)
     AppCompatEditText etWork;
 
+    @BindView(R.id.activity_sce_fab_save)
+    FloatingActionButton fabSave;
+
     private Unbinder unbinder;
     private Realm mRealm;
     private TimeEntryDbAccess timeEntryDbAccess;
@@ -85,6 +89,9 @@ public class ScheduleCreateEditActivity extends BaseActivity implements ProjectL
             CategoryCreateDialog categoryCreateDialog = new CategoryCreateDialog(MyConstant.SCHEDULE_CREATE_EDIT);
             categoryCreateDialog.show(getSupportFragmentManager());
         }
+
+        fabSave.setImageResource(R.drawable.ic_save);
+        fabSave.getDrawable().mutate().setTint(ContextCompat.getColor(this, R.color.colorWhite));
     }
 
     @OnClick(R.id.activity_sce_tv_category)

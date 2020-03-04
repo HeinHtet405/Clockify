@@ -115,7 +115,7 @@ public class ApiKeyActivity extends AppCompatActivity {
 
     private void getProjectData() {
         userInfo = sharePreferenceHelper.getUserInformation();
-        Call<List<Project>> projectCall = RestClient.getProjectEndpoints(sharePreferenceHelper.getApiKey()).getProjectList(userInfo.getActiveWorkspace());
+        Call<List<Project>> projectCall = RestClient.getProjectEndpoints(sharePreferenceHelper.getApiKey()).getProjectList(userInfo.getActiveWorkspace(), 100);
         projectCall.enqueue(new RetrofitCallbackHelper<List<Project>>() {
             @Override
             protected void onSuccess(List<Project> data, int responseCode) {
