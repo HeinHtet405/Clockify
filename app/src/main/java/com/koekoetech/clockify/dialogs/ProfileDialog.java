@@ -82,7 +82,10 @@ public class ProfileDialog extends BaseDialogFragment {
             cbMonth.setChecked(false);
         }
 
-        cbMonth.setOnClickListener(v -> listener.onClickMonthType(cbMonth));
+        cbMonth.setOnClickListener(v -> {
+            listener.onClickMonthType(cbMonth);
+            dismiss();
+        });
     }
 
     @Override
