@@ -27,15 +27,30 @@
             android:ellipsize="end"
             tools:text="Toolbar" />
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/toolbar_ivProfile"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:src="@drawable/ic_key"
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:layout_centerVertical="true"
-            android:layout_alignParentEnd="true"/>
+            android:layout_alignParentEnd="true">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/toolbar_ivRefresh"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_refresh"/>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/toolbar_ivProfile"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_key"/>
+
+        </LinearLayout>
 
     </RelativeLayout>
 

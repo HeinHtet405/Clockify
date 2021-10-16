@@ -26,6 +26,7 @@ import com.koekoetech.clockify.R;
 import com.koekoetech.clockify.activities.base.NetPagingRVActivity;
 import com.koekoetech.clockify.adapters.TimeEntryRecordRVAdapter;
 import com.koekoetech.clockify.dbStorage.CategoryDbAccess;
+import com.koekoetech.clockify.dbStorage.ProjectDbAccess;
 import com.koekoetech.clockify.dbStorage.TimeEntryDbAccess;
 import com.koekoetech.clockify.dbStorage.TimeEntryListDbAccess;
 import com.koekoetech.clockify.dialogs.CategoryCreateDialog;
@@ -39,6 +40,7 @@ import com.koekoetech.clockify.helpers.NetAdapterConfigImpl;
 import com.koekoetech.clockify.helpers.SharePreferenceHelper;
 import com.koekoetech.clockify.interfaces.NetAdapterConfig;
 import com.koekoetech.clockify.models.Category;
+import com.koekoetech.clockify.models.Project;
 import com.koekoetech.clockify.models.TimeEntry;
 import com.koekoetech.clockify.models.TimeEntryRecord;
 import com.koekoetech.clockify.models.TimeEntryWrapper;
@@ -127,9 +129,11 @@ public class MainActivity extends NetPagingRVActivity<List<TimeEntryRecord>, Tim
 
     private int dateType = 0;
 
-    private ArrayList<String> finalDaySelectedList = new ArrayList<>();
+    private final ArrayList<String> finalDaySelectedList = new ArrayList<>();
 
     private boolean selectMonth = false;
+
+    private ProjectDbAccess projectDbAccess;
 
     @Override
     protected int getLayoutResource() {
@@ -226,6 +230,7 @@ public class MainActivity extends NetPagingRVActivity<List<TimeEntryRecord>, Tim
         sharePreferenceHelper = SharePreferenceHelper.getHelper(this);
         userInfo = sharePreferenceHelper.getUserInformation();
         apiKey = sharePreferenceHelper.getApiKey();
+        projectDbAccess = new ProjectDbAccess(mRealm);
 
         Glide.with(this)
                 .load(userInfo.getProfilePicture())
@@ -250,6 +255,35 @@ public class MainActivity extends NetPagingRVActivity<List<TimeEntryRecord>, Tim
         ProfileDialog profileDialog = new ProfileDialog(userInfo);
         profileDialog.show(getSupportFragmentManager());
         profileDialog.setOnClickListener(this);
+    }
+
+    @OnClick(R.id.toolbar_ivRefresh)
+    public void clickRefreshProject() {
+        if (!projectDbAccess.getAllProjectList().isEmpty()) {
+            Toast.makeText(getApplicationContext(), "Refresh Project Data", Toast.LENGTH_SHORT).show();
+            projectDbAccess.deleteAllProjects();
+            getProjectData();
+        }
+    }
+
+    private void getProjectData() {
+        userInfo = sharePreferenceHelper.getUserInformation();
+        Call<List<Project>> projectCall = RestClient.getProjectEndpoints(sharePreferenceHelper.getApiKey()).getProjectList(userInfo.getActiveWorkspace(), 100);
+        projectCall.enqueue(new RetrofitCallbackHelper<List<Project>>() {
+            @Override
+            protected void onSuccess(List<Project> data, int responseCode) {
+                appProgressDialogHelper.dismiss();
+                for (Project project : data) {
+                    projectDbAccess.insertUpdateProject(project);
+                }
+            }
+
+            @Override
+            protected void onFailure(Throwable t, int responseCode, int resultCode) {
+                appProgressDialogHelper.dismiss();
+                t.printStackTrace();
+            }
+        });
     }
 
     @OnClick(R.id.activity_main_btn_category)

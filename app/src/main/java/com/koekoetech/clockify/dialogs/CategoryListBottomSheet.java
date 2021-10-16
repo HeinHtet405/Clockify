@@ -11,6 +11,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.koekoetech.clockify.R;
 import com.koekoetech.clockify.adapters.CategoryRVAdapter;
 import com.koekoetech.clockify.dbStorage.CategoryDbAccess;
+import com.koekoetech.clockify.helpers.MyConstant;
 import com.koekoetech.clockify.models.Category;
 
 import butterknife.BindView;
@@ -61,8 +62,10 @@ public class CategoryListBottomSheet extends BottomSheetDialogFragment {
                 adapter.remove(position);
                 dismiss();
             } else if (view.getId() == R.id.item_category_main) {
-                listener.clickCategory(category);
-                dismiss();
+                if (activityId == MyConstant.MAIN || activityId == MyConstant.SCHEDULE_CREATE_EDIT) {
+                    listener.clickCategory(category);
+                    dismiss();
+                }
             }
         });
         rvCategory.setAdapter(categoryRVAdapter);

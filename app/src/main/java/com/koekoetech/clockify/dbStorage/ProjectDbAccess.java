@@ -33,4 +33,8 @@ public class ProjectDbAccess {
         return mRealm.where(Project.class).equalTo(Project.FIELD_PROJECT_ID, projectId).findFirst();
     }
 
+    public void deleteAllProjects() {
+       mRealm.executeTransaction(realm -> realm.delete(Project.class));
+    }
+
 }
